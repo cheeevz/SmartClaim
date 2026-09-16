@@ -427,3 +427,20 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+## Secrets - IMPORTANT : ne jamais commit tes clés Azure AI / connection strings
+appsettings.Development.json
+appsettings.Local.json
+*.pfx
+.env
+secrets.json
+ 
+## Rider / VS Code
+.idea/
+.vscode/
+*.swp
+ 
+## OS
+.DS_Store
+Thumbs.db
+ 

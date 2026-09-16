@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>SmartClaim.Modern</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- À ajouter en étape 2 : intégration Azure AI
+    <PackageReference Include="Azure.AI.OpenAI" Version="..." />
+    <PackageReference Include="Azure.AI.TextAnalytics" Version="..." />
+    -->
+  </ItemGroup>
+
+</Project>
