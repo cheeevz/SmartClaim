@@ -70,7 +70,7 @@ public class AzureAiClaimAnalysisService : IClaimAnalysisService
 
         var urgency = Enum.TryParse<UrgencyLevel>(root.GetProperty("urgency").GetString(), out var urg)
             ? urg
-            : UrgencyLevel.Normale;
+            : UrgencyLevel.Normal;
 
         var summary = root.GetProperty("summary").GetString() ?? "Résumé indisponible.";
 

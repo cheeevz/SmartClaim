@@ -23,8 +23,8 @@ public partial class MockClaimAnalysisService : IClaimAnalysisService
         var urgency = text switch
         {
             var t when t.Contains("urgent") || t.Contains("inadmissible") || t.Contains("scandaleux") => UrgencyLevel.Critique,
-            var t when t.Contains("rapidement") || t.Contains("déçu") => UrgencyLevel.Elevee,
-            _ => UrgencyLevel.Normale
+            var t when t.Contains("rapidement") || t.Contains("déçu") => UrgencyLevel.Eleve,
+            _ => UrgencyLevel.Normal
         };
 
         var montant = ExtraireMontant(request.Description);

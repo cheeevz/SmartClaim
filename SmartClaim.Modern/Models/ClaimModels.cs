@@ -21,8 +21,8 @@ public enum ClaimCategory
 public enum UrgencyLevel
 {
     Faible,
-    Normale,
-    Elevee,
+    Normal,
+    Eleve,
     Critique
 }
 
