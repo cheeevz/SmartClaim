@@ -35,9 +35,10 @@ actuelle (.NET 10, Minimal APIs, Azure OpenAI, Docker).
 - [x] Intégration Azure OpenAI (gpt-5-mini) pour l'analyse réelle du texte
 - [x] Dockerfile multi-stage + test du conteneur en local
 - [x] Tests unitaires (xUnit) sur le service mocké
-- [ ] Déploiement Azure Container Apps (image publique accessible)
+- [x] Déploiement Azure Container Apps (image publique accessible)
 - [ ] Persistance (Azure SQL ou Table Storage)
 - [ ] CI/CD GitHub Actions
+- [ ] Amélioration sécurité : déplacer la clé Azure OpenAI vers Azure Key Vault (actuellement en variable d'environnement en clair sur le Container App)
 
 ## Lancer le projet en local (avec le SDK .NET installé)
 
@@ -81,3 +82,29 @@ L'API est alors accessible sur `http://localhost:8080/api/claims/process`.
 cd SmartClaim.Tests
 dotnet test
 ```
+
+## Déploiement Azure
+
+L'API est déployée et accessible publiquement sur Azure Container Apps :
+
+```
+https://smartclaim-api.victorioushill-0c5a38a7.swedencentral.azurecontainerapps.io/api/claims/process
+```
+
+**Chaîne de déploiement :**
+
+```
+Image Docker locale
+  → poussée sur Azure Container Registry (ACR)
+  → tirée par Azure Container Apps
+  → exposée publiquement via Ingress (port 8080)
+```
+
+**Ressources Azure utilisées :**
+- `smartclaim-openai-dev` — ressource Azure OpenAI (modèle `gpt-5-mini`)
+- `smartclaimacr` — Azure Container Registry (stockage de l'image Docker)
+- `smartclaim-api` — Azure Container Apps (exécution du conteneur)
+
+La configuration Azure OpenAI est injectée dans le Container App via variables d'environnement
+(`AzureOpenAI__Endpoint`, `AzureOpenAI__ApiKey`, `AzureOpenAI__DeploymentName`), sur le même
+principe qu'en local avec `docker run -e`.
