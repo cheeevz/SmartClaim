@@ -6,8 +6,14 @@ using SmartClaim.Modern.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Injection de dépendances native, sans framework tiers.
-builder.Services.AddScoped<IClaimAnalysisService, MockClaimAnalysisService>();
+builder.Services.AddScoped<IClaimAnalysisService, AzureAiClaimAnalysisService>();
 builder.Services.AddEndpointsApiExplorer();
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+});
 
 var app = builder.Build();
 
