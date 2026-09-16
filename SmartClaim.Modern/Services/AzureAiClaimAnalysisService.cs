@@ -33,7 +33,7 @@ public class AzureAiClaimAnalysisService : IClaimAnalysisService
             Réponds UNIQUEMENT avec un objet JSON valide, sans texte autour, au format exact suivant :
             {
               "category": "Logistique" | "Facturation" | "Technique" | "Autre",
-              "urgency": "Faible" | "Normale" | "Elevee" | "Critique",
+              "urgency": "Faible" | "Normal" | "Eleve" | "Critique",
               "summary": "résumé en une phrase de la réclamation",
               "montantDetecte": nombre décimal ou null si aucun montant mentionné
             }
