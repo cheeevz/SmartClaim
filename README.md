@@ -1,15 +1,15 @@
 # SmartClaim
 
-Système de traitement automatisé de réclamations clients / sinistres — projet vitrine
+Système de traitement automatisé de réclamations clients / sinistres. Projet vitrine
 démontrant une modernisation de code legacy (.NET Framework 4.6) vers une stack
 actuelle (.NET 10, Minimal APIs, Azure OpenAI, Docker).
 
 ## Structure
 
-- `SmartClaim.Modern/` — l'API .NET 10 réelle du projet (Minimal API, DI native, records, pattern matching, intégration Azure OpenAI)
-- `SmartClaim.Legacy/` — un fichier illustratif uniquement, non buildable, pour montrer le style de code "avant"
-- `SmartClaim.Tests/` — tests unitaires (xUnit) du service d'analyse
-- `Dockerfile` / `.dockerignore` — conteneurisation de l'API
+- `SmartClaim.Modern/` : l'API .NET 10 réelle du projet (Minimal API, DI native, records, pattern matching, intégration Azure OpenAI)
+- `SmartClaim.Legacy/` : un fichier illustratif uniquement, non buildable, pour montrer le style de code "avant"
+- `SmartClaim.Tests/` : tests unitaires (xUnit) du service d'analyse
+- `Dockerfile` / `.dockerignore` : conteneurisation de l'API
 
 ## Différences de syntaxe illustrées (legacy → moderne)
 
@@ -25,13 +25,13 @@ actuelle (.NET 10, Minimal APIs, Azure OpenAI, Docker).
 ## Architecture du service d'analyse
 
 `IClaimAnalysisService` est une abstraction avec deux implémentations :
-- `MockClaimAnalysisService` — classification par mots-clés, sans dépendance externe, utilisée pour les tests unitaires
-- `AzureAiClaimAnalysisService` — appelle un modèle **gpt-5-mini** déployé sur **Azure OpenAI** pour classifier la réclamation, évaluer son urgence, en extraire un résumé et les entités clés (montant, numéro de contrat)
+- `MockClaimAnalysisService` : classification par mots-clés, sans dépendance externe, utilisée pour les tests unitaires
+- `AzureAiClaimAnalysisService` : appelle un modèle **gpt-5-mini** déployé sur **Azure OpenAI** pour classifier la réclamation, évaluer son urgence, en extraire un résumé et les entités clés (montant, numéro de contrat)
 
 ## Endpoints
 
-- `POST /api/claims/process` — analyse une réclamation (via Azure OpenAI) et persiste le résultat en base
-- `GET /api/claims` — liste les réclamations déjà traitées, les plus récentes en premier
+- `POST /api/claims/process` : analyse une réclamation (via Azure OpenAI) et persiste le résultat en base
+- `GET /api/claims` : liste les réclamations déjà traitées, les plus récentes en premier
 
 ## Persistance
 
@@ -49,8 +49,7 @@ EF Core (`SmartClaim.Modern/Migrations/`), appliquées automatiquement au démar
 - [x] Déploiement Azure Container Apps (image publique accessible)
 - [x] Persistance (Azure SQL Database via Entity Framework Core)
 - [ ] CI/CD GitHub Actions
-- [ ] Mettre à jour le Container App pour connecter la base de données en production (variables d'environnement + migration des restrictions de pare-feu Azure SQL)
-- [ ] Amélioration sécurité : déplacer la clé Azure OpenAI vers Azure Key Vault (actuellement en variable d'environnement en clair sur le Container App)
+- [ ] Amélioration sécurité : déplacer la clé Azure OpenAI et la chaîne de connexion SQL vers Azure Key Vault (actuellement en variables d'environnement en clair sur le Container App)
 
 ## Lancer le projet en local (avec le SDK .NET installé)
 
@@ -73,7 +72,7 @@ Invoke-RestMethod -Uri "http://localhost:5000/api/claims/process" -Method Post -
 
 La configuration Azure OpenAI (endpoint, clé, nom de déploiement) et la chaîne de connexion Azure SQL
 (`ConnectionStrings:SmartClaimDb`) se renseignent dans `SmartClaim.Modern/appsettings.Development.json`
-(fichier local, jamais commité — voir `.gitignore`).
+(fichier local, jamais commité, voir `.gitignore`).
 
 ## Lancer avec Docker
 
@@ -114,10 +113,11 @@ Image Docker locale
 ```
 
 **Ressources Azure utilisées :**
-- `smartclaim-openai-dev` — ressource Azure OpenAI (modèle `gpt-5-mini`)
-- `smartclaimacr` — Azure Container Registry (stockage de l'image Docker)
-- `smartclaim-api` — Azure Container Apps (exécution du conteneur)
+- `smartclaim-openai-dev` : ressource Azure OpenAI (modèle `gpt-5-mini`)
+- `smartclaimacr` : Azure Container Registry (stockage de l'image Docker)
+- `smartclaim-api` : Azure Container Apps (exécution du conteneur)
 
-La configuration Azure OpenAI est injectée dans le Container App via variables d'environnement
-(`AzureOpenAI__Endpoint`, `AzureOpenAI__ApiKey`, `AzureOpenAI__DeploymentName`), sur le même
-principe qu'en local avec `docker run -e`.
+La configuration Azure OpenAI et la chaîne de connexion Azure SQL sont injectées dans le Container App
+via variables d'environnement (`AzureOpenAI__Endpoint`, `AzureOpenAI__ApiKey`, `AzureOpenAI__DeploymentName`,
+`ConnectionStrings__SmartClaimDb`), sur le même principe qu'en local avec `docker run -e`. La persistance
+fonctionne donc aussi bien en local qu'en production.
