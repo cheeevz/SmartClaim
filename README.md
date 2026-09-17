@@ -19,7 +19,7 @@ actuelle (.NET 10, Minimal APIs, Azure OpenAI, Docker).
 | Modèles de données | Classe avec getters/setters explicites | `record` immuable, concis |
 | Classification | Cascade de `if/else` | `switch` expression avec pattern matching |
 | Asynchrone | Appels bloquants (`ExecuteNonQuery`) | `async`/`await` de bout en bout |
-| Accès aux données | SQL concaténé à la main (faille d'injection) | À faire en étape suivante : requêtes paramétrées / EF Core |
+| Accès aux données | SQL concaténé à la main (faille d'injection) | Entity Framework Core (LINQ, requêtes paramétrées automatiquement) |
 | Routage HTTP | Contrôleurs + attributs | Minimal API (`app.MapPost(...)`) |
 
 ## Architecture du service d'analyse
@@ -27,6 +27,17 @@ actuelle (.NET 10, Minimal APIs, Azure OpenAI, Docker).
 `IClaimAnalysisService` est une abstraction avec deux implémentations :
 - `MockClaimAnalysisService` — classification par mots-clés, sans dépendance externe, utilisée pour les tests unitaires
 - `AzureAiClaimAnalysisService` — appelle un modèle **gpt-5-mini** déployé sur **Azure OpenAI** pour classifier la réclamation, évaluer son urgence, en extraire un résumé et les entités clés (montant, numéro de contrat)
+
+## Endpoints
+
+- `POST /api/claims/process` — analyse une réclamation (via Azure OpenAI) et persiste le résultat en base
+- `GET /api/claims` — liste les réclamations déjà traitées, les plus récentes en premier
+
+## Persistance
+
+Chaque réclamation traitée est enregistrée dans une table `Claims` sur **Azure SQL Database**,
+via **Entity Framework Core** (`SmartClaimDbContext`). Le schéma de la base est géré par migrations
+EF Core (`SmartClaim.Modern/Migrations/`), appliquées automatiquement au démarrage de l'application.
 
 ## État actuel
 
@@ -36,8 +47,9 @@ actuelle (.NET 10, Minimal APIs, Azure OpenAI, Docker).
 - [x] Dockerfile multi-stage + test du conteneur en local
 - [x] Tests unitaires (xUnit) sur le service mocké
 - [x] Déploiement Azure Container Apps (image publique accessible)
-- [ ] Persistance (Azure SQL ou Table Storage)
+- [x] Persistance (Azure SQL Database via Entity Framework Core)
 - [ ] CI/CD GitHub Actions
+- [ ] Mettre à jour le Container App pour connecter la base de données en production (variables d'environnement + migration des restrictions de pare-feu Azure SQL)
 - [ ] Amélioration sécurité : déplacer la clé Azure OpenAI vers Azure Key Vault (actuellement en variable d'environnement en clair sur le Container App)
 
 ## Lancer le projet en local (avec le SDK .NET installé)
@@ -59,8 +71,9 @@ $body = @{
 Invoke-RestMethod -Uri "http://localhost:5000/api/claims/process" -Method Post -Body $body -ContentType "application/json"
 ```
 
-La configuration Azure OpenAI (endpoint, clé, nom de déploiement) se renseigne dans
-`SmartClaim.Modern/appsettings.Development.json` (fichier local, jamais commité — voir `.gitignore`).
+La configuration Azure OpenAI (endpoint, clé, nom de déploiement) et la chaîne de connexion Azure SQL
+(`ConnectionStrings:SmartClaimDb`) se renseignent dans `SmartClaim.Modern/appsettings.Development.json`
+(fichier local, jamais commité — voir `.gitignore`).
 
 ## Lancer avec Docker
 
